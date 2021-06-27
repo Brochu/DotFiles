@@ -59,6 +59,7 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/completion-nvim'
 
 Plug 'tpope/vim-rails'
+Plug 'tikhomirov/vim-glsl'
 
 Plug 'gruvbox-community/gruvbox'
 call plug#end()
@@ -82,6 +83,9 @@ nnoremap <leader>jr <cmd>lua vim.lsp.buf.references()<CR>
 "nnoremap <leader>jb <cmd>lua vim.lsp.buf.document_symbol()<CR>
 "nnoremap <leader>jw <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
 "nnoremap <leader>jl <cmd>lua vim.lsp.buf.declaration()<CR>
+
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<cr>" : "\<TAB>"
 
 " Tab Nav
 nnoremap <C-k> :bprev<CR>
@@ -117,4 +121,5 @@ augroup END
 lua << EOF
     require'lspconfig'.solargraph.setup{on_attach=require'completion'.on_attach}
     require'lspconfig'.clangd.setup{on_attach=require'completion'.on_attach}
+    require'lspconfig'.pyright.setup{on_attach=require'completion'.on_attach}
 EOF
