@@ -61,6 +61,8 @@ Plug 'nvim-lua/completion-nvim'
 Plug 'tpope/vim-rails'
 Plug 'tikhomirov/vim-glsl'
 
+Plug 'aklt/plantuml-syntax'
+
 Plug 'gruvbox-community/gruvbox'
 call plug#end()
 
