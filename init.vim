@@ -63,6 +63,8 @@ Plug 'tikhomirov/vim-glsl'
 
 Plug 'aklt/plantuml-syntax'
 
+Plug 'tpope/vim-fugitive'
+
 Plug 'gruvbox-community/gruvbox'
 call plug#end()
 
@@ -74,15 +76,19 @@ let mapleader = " "
 " Telescope mappings
 nnoremap <leader>ps :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep for > ") })<CR>
 nnoremap <leader>pf :Telescope find_files<CR>
+nnoremap <leader>pb :Telescope current_buffer_fuzzy_find<CR>
+nnoremap <leader>pl :lua require('telescope.builtin').live_grep()<CR>
+nnoremap <leader>po :lua require('telescope.builtin').live_grep({grep_open_files=true})<CR>
+nnoremap <leader>pd :lua require('telescope.builtin').lsp_document_symbols()<CR>
 
 " LSP mappings
 nnoremap <leader>jd <cmd>lua vim.lsp.buf.definition()<CR>
 "nnoremap <leader>K  <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>ji <cmd>lua vim.lsp.buf.implementation()<CR>
-"nnoremap <leader>js <cmd>lua vim.lsp.buf.signature_help()<CR>
+"nnoremap <leader>jh <cmd>lua vim.lsp.buf.signature_help()<CR>
 "nnoremap <leader>jt <cmd>lua vim.lsp.buf.type_definition()<CR>
 nnoremap <leader>jr <cmd>lua vim.lsp.buf.references()<CR>
-"nnoremap <leader>jb <cmd>lua vim.lsp.buf.document_symbol()<CR>
+"nnoremap <leader>js <cmd>lua vim.lsp.buf.document_symbol()<CR>
 "nnoremap <leader>jw <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
 "nnoremap <leader>jl <cmd>lua vim.lsp.buf.declaration()<CR>
 
@@ -93,17 +99,15 @@ inoremap <expr><TAB>  pumvisible() ? "\<cr>" : "\<TAB>"
 nnoremap <C-k> :bprev<CR>
 nnoremap <C-j> :bnext<CR>
 nnoremap <leader>bl :ls<CR>
-nnoremap <leader>w :bd<CR>
 
 " Window Nav
-nnoremap <leader>h :wincmd h<CR>
-nnoremap <leader>j :wincmd j<CR>
-nnoremap <leader>k :wincmd k<CR>
-nnoremap <leader>l :wincmd l<CR>
+nnoremap <leader>e :Explore<CR>
+nnoremap <leader>q :bd<CR>
 
 " QuickFix Nav
-nnoremap <S-k> :cprev<CR>
-nnoremap <S-j> :cnext<CR>
+nnoremap <leader>k :cprev<CR>
+nnoremap <leader>j :cnext<CR>
+nnoremap <leader>co :copen<CR>
 
 " Visual Indent Keep Selected
 vnoremap < <gv
@@ -122,6 +126,18 @@ augroup END
 
 lua << EOF
     require'lspconfig'.solargraph.setup{on_attach=require'completion'.on_attach}
-    require'lspconfig'.clangd.setup{on_attach=require'completion'.on_attach}
+    require'lspconfig'.clangd.setup{on_attach=require'completion'.on_attach, cmd = { "clangd", "--background-index"}}
     require'lspconfig'.pyright.setup{on_attach=require'completion'.on_attach}
+    require'lspconfig'.gopls.setup{on_attach=require'completion'.on_attach}
+    require'lspconfig'.racket_langserver.setup{on_attach=require'completion'.on_attach}
+
+    require'nvim-treesitter.configs'.setup { highlight = {enable = true}, incremental_selection = {enable = true}, textobjects = {enable = true}}
+    require'nvim-treesitter.configs'.setup {
+        playground = {
+            enable = true,
+            disable = {},
+            updatetime = 25,
+            persist_queries = false
+        }
+    }
 EOF
