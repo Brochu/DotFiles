@@ -26,7 +26,7 @@ set termguicolors
 set t_Co=256
 set scrolloff=8
 set noshowmode
-set completeopt=menuone,noinsert
+set completeopt=menu,menuone,noselect
 set colorcolumn=120
 set signcolumn=number
 set background=dark
@@ -56,7 +56,19 @@ Plug 'yggdroot/indentline'
 Plug 'itchyny/lightline.vim'
 
 Plug 'neovim/nvim-lspconfig'
-Plug 'nvim-lua/completion-nvim'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+" For vsnip users.
+Plug 'hrsh7th/cmp-vsnip'
+Plug 'hrsh7th/vim-vsnip'
+
+" COQ nvim auto complete
+" Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
+" 9000+ Snippets
+" Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
 
 Plug 'tpope/vim-rails'
 Plug 'tikhomirov/vim-glsl'
@@ -91,6 +103,7 @@ nnoremap <leader>jr <cmd>lua vim.lsp.buf.references()<CR>
 "nnoremap <leader>js <cmd>lua vim.lsp.buf.document_symbol()<CR>
 "nnoremap <leader>jw <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
 "nnoremap <leader>jl <cmd>lua vim.lsp.buf.declaration()<CR>
+nnoremap <leader>sd <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
 
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<cr>" : "\<TAB>"
@@ -125,12 +138,82 @@ augroup ALEXB
 augroup END
 
 lua << EOF
-    require'lspconfig'.solargraph.setup{on_attach=require'completion'.on_attach}
-    require'lspconfig'.clangd.setup{on_attach=require'completion'.on_attach, cmd = { "clangd", "--background-index"}}
-    require'lspconfig'.pyright.setup{on_attach=require'completion'.on_attach}
-    require'lspconfig'.gopls.setup{on_attach=require'completion'.on_attach}
-    require'lspconfig'.racket_langserver.setup{on_attach=require'completion'.on_attach}
+  -- If I ever want to try COQ autocomplete
+  -- local lsp = require "lspconfig"
+  -- local coq = require "coq" -- add this
 
+  -- lsp.<server>.setup(<stuff...>)                              -- before
+  -- lsp.<server>.setup(coq.lsp_ensure_capabilities(<stuff...>)) -- after
+
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      end,
+    },
+    mapping = {
+      ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+      ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(12), { 'i', 'c' }),
+      ['<C-s>'] = cmp.mapping.complete({
+        config = {
+          sources = {
+            { name = 'nvim_lsp' }
+          }
+        }
+      }, { 'i', 'c' }),
+      ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+      ['<C-e>'] = cmp.mapping({
+        i = cmp.mapping.abort(),
+        c = cmp.mapping.close(),
+      }),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      ['<TAB>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    },
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' }, -- For vsnip users.
+      -- { name = 'luasnip' }, -- For luasnip users.
+      -- { name = 'ultisnips' }, -- For ultisnips users.
+      -- { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline('/', {
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Setup lspconfig.
+  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  require('lspconfig')['clangd'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['pyright'].setup {
+    capabilities = capabilities
+  }
+
+    -- Setup Treesitter
     require'nvim-treesitter.configs'.setup { highlight = {enable = true}, incremental_selection = {enable = true}, textobjects = {enable = true}}
     require'nvim-treesitter.configs'.setup {
         playground = {
