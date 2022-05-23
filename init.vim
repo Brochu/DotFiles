@@ -72,8 +72,8 @@ Plug 'hrsh7th/vim-vsnip'
 
 Plug 'tpope/vim-rails'
 Plug 'tikhomirov/vim-glsl'
-
 Plug 'aklt/plantuml-syntax'
+Plug 'rust-lang/rust.vim'
 
 Plug 'tpope/vim-fugitive'
 
