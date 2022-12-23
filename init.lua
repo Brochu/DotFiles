@@ -50,11 +50,14 @@ require('packer').startup(function(use)
     after = 'nvim-treesitter',
   }
 
+  use 'nvim-treesitter/playground'
+
   -- Git related plugins
   use 'tpope/vim-fugitive'
   use 'tpope/vim-rhubarb'
   use 'lewis6991/gitsigns.nvim'
 
+  use { "catppuccin/nvim", as = "catppuccin" }
   use 'navarasu/onedark.nvim' -- Theme inspired by Atom
   use 'nvim-lualine/lualine.nvim' -- Fancier statusline
   use 'lukas-reineke/indent-blankline.nvim' -- Add indentation guides even on blank lines
@@ -101,25 +104,27 @@ vim.api.nvim_create_autocmd('BufWritePost', {
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
+vim.o.exrc = true
 
 -- Set highlight on search
 vim.o.hlsearch = false
 
 -- Make line numbers default
-vim.wo.number = true
+vim.o.number = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode
-vim.o.mouse = ''
 vim.o.guicursor = ''
+vim.o.mouse = 'c'
 
 -- Enable break indent
 vim.o.breakindent = true
 
--- Save undo history
+-- Save undo history, swap, backup
 vim.o.undofile = true
-
--- Swapfile
 vim.o.swapfile = false
+vim.o.backup = false
+vim.o.writebackup = false
 
 -- Case insensitive searching UNLESS /C or capital in search
 vim.o.ignorecase = true
@@ -127,14 +132,33 @@ vim.o.smartcase = true
 
 -- Decrease update time
 vim.o.updatetime = 250
-vim.wo.signcolumn = 'yes'
+vim.o.signcolumn = 'number'
 
 -- Set colorscheme
 vim.o.termguicolors = true
-vim.cmd [[colorscheme onedark]]
+vim.o.background = 'dark'
+vim.cmd [[colorscheme catppuccin-macchiato]]
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
+
+-- AlexB Custom sets
+vim.o.hidden = true
+vim.o.errorbells = false
+
+vim.o.tabstop = 4
+vim.o.softtabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.smartindent = true
+
+vim.o.wrap = false
+vim.o.smartcase = true
+
+vim.o.incsearch = true
+vim.o.scrolloff = 7
+vim.o.showmode = false
+vim.o.colorcolumn = 120
 
 -- [[ Basic Keymaps ]]
 -- Set <space> as the leader key
@@ -150,6 +174,17 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- Buffer navigation
+vim.keymap.set('n', '<C-e>', '<cmd>Explore<CR>')
+vim.keymap.set('n', '<C-q>', '<cmd>bd<CR>')
+
+-- Keep selected when visual indenting
+vim.keymap.set('v', '<', '<gv')
+vim.keymap.set('v', '>', '>gv')
+
+-- Shhhhh
+vim.keymap.set('i', '<C-c>', '<C-[>')
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
