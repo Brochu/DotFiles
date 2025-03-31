@@ -452,16 +452,12 @@ require("lazy").setup({
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
-			local servers = {
-				-- clangd = {},
-				-- gopls = {},
-				-- pyright = {},
-				-- rust_analyzer = {},
-			}
-
             local server = {}
             server.capabilities = capabilities
             require("lspconfig").clangd.setup(server)
+            require("lspconfig").ols.setup(server)
+            require("lspconfig").gopls.setup(server)
+            require("lspconfig").rust_analyzer.setup(server)
 		end,
 	},
 
@@ -539,16 +535,22 @@ require("lazy").setup({
 					{ name = "path" },
 				},
 			})
-
-            require("cmp").setup.cmdline("/", {
-                sources = { { name = "buffer" } },
-            })
-            require("cmp").setup.cmdline(":", {
-                sources = {
-                    { name = "cmdline" },
-                    { name = "path" },
-                },
-            })
 		end,
 	},
+},
+{
+    rocks = {
+        enabled = false,
+        hererocks = false
+    }
+})
+
+require("cmp").setup.cmdline("/", {
+    sources = { { name = "buffer" } },
+})
+require("cmp").setup.cmdline(":", {
+    sources = {
+        { name = "cmdline" },
+        { name = "path" },
+    },
 })
