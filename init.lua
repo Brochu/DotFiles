@@ -4,6 +4,16 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.loader.enable()
+
+-- init.lua
+-- vim.g.do_filetype_lua = 1
+-- vim.g.did_load_filetypes = 0
+
+-- Critical settings for colorscheme
+vim.opt.termguicolors = true
+vim.cmd("syntax enable")
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
@@ -162,7 +172,12 @@ require('lazy').setup({
     {
         "rebelot/kanagawa.nvim",
         init = function()
-            vim.cmd.colorscheme("kanagawa")
+            require('kanagawa').setup({
+                compile = true,
+                theme = "wave", -- Pre-compile all themes by cycling through them
+                background = { dark = "dragon", light = "lotus" }, -- Compile dark/light variants
+            })
+            vim.cmd.colorscheme("kanagawa-wave")
         end,
     },
 
