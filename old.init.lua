@@ -12,6 +12,7 @@ vim.loader.enable()
 
 -- Critical settings for colorscheme
 vim.opt.termguicolors = true
+vim.cmd("syntax enable")
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
@@ -27,9 +28,9 @@ vim.opt.number = true
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
 
--- Disable mouse in the editor
+-- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.guicursor = ""
-vim.opt.mouse = ""
+vim.opt.mouse = "c"
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -86,7 +87,9 @@ vim.opt.scrolloff = 7
 
 -- MY OWN SETS
 vim.opt.exrc = true
-vim.opt.hlsearch = true
+vim.opt.hlsearch = false
+vim.opt.hidden = true
+vim.opt.errorbells = false
 
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
@@ -98,18 +101,8 @@ vim.opt.wrap = false
 vim.opt.incsearch = true
 vim.opt.colorcolumn = "120"
 
--- Diagnostic display config
-vim.diagnostic.config({
-    virtual_text = { spacing = 4, prefix = "●" },
-    severity_sort = true,
-    float = { border = "rounded" },
-})
-
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
-
--- Quick save
-vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -134,16 +127,16 @@ vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set("n", "<down>", '<cmd>echo "Use j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
---  Use <leader>w + hjkl to switch between windows
+--  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set("n", "<leader>wh", "<C-w><C-h>", { desc = "Move focus to the left window" })
-vim.keymap.set("n", "<leader>wl", "<C-w><C-l>", { desc = "Move focus to the right window" })
-vim.keymap.set("n", "<leader>wj", "<C-w><C-j>", { desc = "Move focus to the lower window" })
-vim.keymap.set("n", "<leader>wk", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
+vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
+vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
 -- CUSTOM KEYMAPS
-vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
+vim.keymap.set({ "n", "v" }, "<Space", "<Nop>", { silent = true })
 
 -- word wrap utilities
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -174,137 +167,6 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
     "tpope/vim-fugitive",
-
-    -- Oil
-    {
-        'stevearc/oil.nvim',
-        ---@module 'oil'
-        ---@type oil.SetupOpts
-        -- Optional dependencies
-        dependencies = { { "nvim-mini/mini.icons", opts = {} } },
-        -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
-        -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
-        lazy = false,
-        config = function()
-            require("oil").setup({
-                -- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
-                default_file_explorer = true,
-                columns = {
-                    "icon",
-                    "size",
-                },
-                buf_options = {
-                    buflisted = false,
-                    bufhidden = "hide",
-                },
-                win_options = {
-                    wrap = false,
-                    signcolumn = "no",
-                    cursorcolumn = false,
-                    foldcolumn = "0",
-                    spell = false,
-                    list = false,
-                    conceallevel = 3,
-                    concealcursor = "nvic",
-                },
-                delete_to_trash = false,
-                skip_confirm_for_simple_edits = false,
-                prompt_save_on_select_new_entry = true,
-                cleanup_delay_ms = 2000,
-                lsp_file_methods = {
-                    enabled = true,
-                    timeout_ms = 1000,
-                    autosave_changes = false,
-                },
-                constrain_cursor = "editable",
-                watch_for_changes = false,
-                keymaps = {
-                    ["g?"] = { "actions.show_help", mode = "n" },
-                    ["<CR>"] = "actions.select",
-                    ["<C-s>"] = { "actions.select", opts = { vertical = true } },
-                    ["<C-h>"] = { "actions.select", opts = { horizontal = true } },
-                    ["<C-t>"] = { "actions.select", opts = { tab = true } },
-                    ["<C-p>"] = "actions.preview",
-                    ["<C-c>"] = { "actions.close", mode = "n" },
-                    ["<C-l>"] = "actions.refresh",
-                    ["-"] = { "actions.parent", mode = "n" },
-                    ["_"] = { "actions.open_cwd", mode = "n" },
-                    ["`"] = { "actions.cd", mode = "n" },
-                    ["~"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
-                    ["gs"] = { "actions.change_sort", mode = "n" },
-                    ["gx"] = "actions.open_external",
-                    ["g."] = { "actions.toggle_hidden", mode = "n" },
-                    ["g\\"] = { "actions.toggle_trash", mode = "n" },
-                },
-                use_default_keymaps = true,
-                view_options = {
-                    show_hidden = false,
-                    is_hidden_file = function(name, bufnr)
-                        local m = name:match("^%.")
-                        return m ~= nil
-                    end,
-                    is_always_hidden = function(name, bufnr)
-                        return false
-                    end,
-                    natural_order = "fast",
-                    case_insensitive = false,
-                    sort = {
-                        { "type", "asc" },
-                        { "name", "asc" },
-                    },
-                    highlight_filename = function(entry, is_hidden, is_link_target, is_link_orphan)
-                        return nil
-                    end,
-                },
-                extra_scp_args = {},
-                git = {
-                    add = function(path) return false end,
-                    mv = function(src_path, dest_path) return false end,
-                    rm = function(path) return false end,
-                },
-                float = {
-                    padding = 2,
-                    max_width = 0,
-                    max_height = 0,
-                    border = nil,
-                    win_options = { winblend = 0 },
-                    get_win_title = nil,
-                    preview_split = "auto",
-                    override = function(conf) return conf end,
-                },
-                preview_win = {
-                    update_on_cursor_moved = true,
-                    preview_method = "fast_scratch",
-                    disable_preview = function(filename) return false end,
-                    win_options = {},
-                },
-                confirmation = {
-                    max_width = 0.9,
-                    min_width = { 40, 0.4 },
-                    width = nil,
-                    max_height = 0.9,
-                    min_height = { 5, 0.1 },
-                    height = nil,
-                    border = nil,
-                    win_options = { winblend = 0 },
-                },
-                progress = {
-                    max_width = 0.9,
-                    min_width = { 40, 0.4 },
-                    width = nil,
-                    max_height = { 10, 0.9 },
-                    min_height = { 5, 0.1 },
-                    height = nil,
-                    border = nil,
-                    minimized_border = "none",
-                    win_options = { winblend = 0 },
-                },
-                ssh = { border = nil },
-                keymaps_help = { border = nil },
-            })
-            vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent dir"})
-        end
-    },
 
     -- Color scheme
     {
@@ -343,7 +205,7 @@ require('lazy').setup({
         },
         config = function()
             require("telescope").setup {
-                extensions = {
+                extension = {
                     ['ui-select'] = {
                         require('telescope.themes').get_dropdown(),
                     },
@@ -402,8 +264,6 @@ require('lazy').setup({
                 "c",
                 "cpp",
                 "odin",
-                "lua",
-                "glsl",
                 "diff",
                 "markdown",
                 "markdown_inline",
@@ -487,15 +347,12 @@ require('lazy').setup({
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
-            vim.lsp.config('clangd', {
-                capabilities = capabilities,
-                cmd = { "clangd", "--background-index", "--clang-tidy", "--completion-style=detailed" },
-            })
-            vim.lsp.config('ols', { capabilities = capabilities })
-            vim.lsp.config('gopls', { capabilities = capabilities })
-            vim.lsp.config('rust_analyzer', { capabilities = capabilities })
-
-            vim.lsp.enable({ 'clangd', 'ols', 'gopls', 'rust_analyzer' })
+            local server = {}
+            server.capabilities = capabilities
+            require("lspconfig").clangd.setup(server)
+            require("lspconfig").ols.setup(server)
+            require("lspconfig").gopls.setup(server)
+            require("lspconfig").rust_analyzer.setup(server)
         end
     },
 
@@ -546,17 +403,24 @@ require('lazy').setup({
                     --  completions whenever it has completion options available.
                     ["<C-Space>"] = cmp.mapping.complete({}),
 
-                    -- Luasnip keymaps (uncomment if you add LuaSnip as a dependency)
-                    -- ["<C-l>"] = cmp.mapping(function()
-                    --     if luasnip.expand_or_locally_jumpable() then
-                    --         luasnip.expand_or_jump()
-                    --     end
-                    -- end, { "i", "s" }),
-                    -- ["<C-h>"] = cmp.mapping(function()
-                    --     if luasnip.locally_jumpable(-1) then
-                    --         luasnip.jump(-1)
-                    --     end
-                    -- end, { "i", "s" }),
+                    -- Think of <c-l> as moving to the right of your snippet expansion.
+                    --  So if you have a snippet that's like:
+                    --  function $name($args)
+                    --    $body
+                    --  end
+                    --
+                    -- <c-l> will move you to the right of each of the expansion locations.
+                    -- <c-h> is similar, except moving you backwards.
+                    ["<C-l>"] = cmp.mapping(function()
+                        if luasnip.expand_or_locally_jumpable() then
+                            luasnip.expand_or_jump()
+                        end
+                    end, { "i", "s" }),
+                    ["<C-h>"] = cmp.mapping(function()
+                        if luasnip.locally_jumpable(-1) then
+                            luasnip.jump(-1)
+                        end
+                    end, { "i", "s" }),
 
                     -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
                     --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
